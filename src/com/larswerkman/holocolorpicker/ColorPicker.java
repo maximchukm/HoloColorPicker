@@ -19,12 +19,7 @@ package com.larswerkman.holocolorpicker;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.SweepGradient;
+import android.graphics.*;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -212,6 +207,8 @@ public class ColorPicker extends View {
 	 * {@code onColorChangedListener} instance of the onColorChangedListener
 	 */
 	private OnColorChangedListener onColorChangedListener;
+
+    private OnClickListener onClickListener;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -537,10 +534,14 @@ public class ColorPicker extends View {
 			// Check whether the user pressed on the center.
 			else if (x >= -mColorCenterRadius && x <= mColorCenterRadius
 					&& y >= -mColorCenterRadius && y <= mColorCenterRadius) {
-				mCenterHaloPaint.setAlpha(0x50);
-				setColor(getOldCenterColor());
-				mCenterNewPaint.setColor(getOldCenterColor());
-				invalidate();
+                if (onClickListener != null) {
+                    onClickListener.onClick(this);
+                } else {
+                    mCenterHaloPaint.setAlpha(0x50);
+                    setColor(getOldCenterColor());
+                    mCenterNewPaint.setColor(getOldCenterColor());
+                    invalidate();
+                }
 			}
 			// If user did not press pointer or center, report event not handled
 			else{
@@ -588,7 +589,12 @@ public class ColorPicker extends View {
 		return true;
 	}
 
-	/**
+    @Override
+    public void setOnClickListener(OnClickListener l) {
+        this.onClickListener = l;
+    }
+
+    /**
 	 * Calculate the pointer's coordinates on the color wheel using the supplied
 	 * angle.
 	 * 
